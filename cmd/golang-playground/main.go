@@ -26,15 +26,15 @@ var requestsCount uint64
 func main() {
 	log.Print("Starting the application...")
 
-	/* 	blPort := os.Getenv("PORT")
-	   	if len(blPort) == 0 {
-	   		log.Fatal("The application port should be set")
-	   	}
+	blPort := os.Getenv("PORT")
+   	if len(blPort) == 0 {
+   		log.Fatal("The application port should be set")
+   	}
 
-	   	diagPort := os.Getenv("DIAG_PORT")
-	   	if len(diagPort) == 0 {
-	   		log.Fatal("The diagnostics port should be set")
-	   	} */
+   	diagPort := os.Getenv("DIAG_PORT")
+   	if len(diagPort) == 0 {
+   		log.Fatal("The diagnostics port should be set")
+   	} 
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", hello)
@@ -44,12 +44,12 @@ func main() {
 
 	configs := []ServerConfig{
 		{
-			port:   "8080",
+			port:   blPort,
 			router: router,
 			name:   "Application server",
 		},
 		{
-			port:   "8585",
+			port:   diagPort,
 			router: diagRouter,
 			name:   "Diagnostics server",
 		},

@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 go build -o bin/golang-playground github.com/kuskmen/golang-pl
 FROM scratch
 
 ENV PORT 8080
-ENV DIAGNOSTICTS_PORT 8585
+ENV DIAG_PORT 8585
 
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
@@ -22,6 +22,6 @@ USER appuser
 
 COPY --from=0 /go/src/github.com/kuskmen/golang-playground/bin/golang-playground /golang-playground
 EXPOSE $PORT
-EXPOSE $DIAGNOSTICTS_PORT
+EXPOSE $DIAG_PORT
 
 CMD ["/golang-playground"]
