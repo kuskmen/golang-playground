@@ -1,7 +1,7 @@
 FROM golang:1.11
 
 # Add a non-privileged user
-RUN useradd -u 10001 hello-app
+RUN useradd -u 10001 appuser
 
 RUN mkdir -p /go/src/github.com/kuskmen/golang-playground
 ADD . /go/src/github.com/kuskmen/golang-playground
@@ -18,7 +18,7 @@ ENV DIAGNOSTICTS_PORT 8585
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 COPY --from=0 /etc/passwd /etc/passwd
-USER hello-app
+USER appuser
 
 COPY --from=0 /go/src/github.com/kuskmen/golang-playground/bin/golang-playground /golang-playground
 EXPOSE $PORT
