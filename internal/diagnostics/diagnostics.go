@@ -9,8 +9,6 @@ import (
 )
 
 func NewDiagnostics() *mux.Router {
-	log.Print("The diagnostics server is preparing to handle connections...")
-
 	router := mux.NewRouter()
 	router.HandleFunc("/health", health)
 	router.HandleFunc("/ready", ready)

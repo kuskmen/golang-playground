@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -16,6 +20,8 @@ type ServerConfig struct {
 	router http.Handler
 	name   string
 }
+
+var requestsCount uint64
 
 func main() {
 	log.Print("Starting the application...")
@@ -69,25 +75,31 @@ func main() {
 		i++
 	}
 
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
 	select {
 	case err := <-errorChannel:
+		log.Printf("Received an error: %v", err)
+	case sig := <-interrupt:
+		log.Printf("Received the signal %v", sig)
+	}
+
+	for _, s := range servers {
 		context, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 		defer cancel()
 
-		for _, s := range servers {
-			shutDownError := s.Shutdown(context)
-			if shutDownError != nil {
-				log.Print(shutDownError)
-			}
-
-			log.Println("Server gracefully shutdown.")
+		err := s.Shutdown(context)
+		if err != nil {
+			log.Print(err)
 		}
-
-		log.Fatal(err)
+		log.Println("Server gracefully shutdown.")
 	}
 }
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	log.Print("The hello handler was called.")
-	fmt.Fprint(w, http.StatusText(http.StatusOK))
+
+	atomic.AddUint64(&requestsCount, 1)
+	fmt.Fprintf(w, "The hello handler was called %v times.", atomic.LoadUint64(&requestsCount))
 }
